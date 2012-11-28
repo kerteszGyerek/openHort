@@ -14,6 +14,7 @@ void setup(){
 //----------------------------  
 
   while(timeStatus()!= timeSet){
+    //Az alarmok nem fognak rendesn mukodni, ha nincs szinkronizalva az ido, ezzel kell kezdeni.
     Serial.print("Waiting for sync message");
     Serial.print("\n");
     if(Serial.available() ){
@@ -22,18 +23,16 @@ void setup(){
     Alarm.delay(1000);
   }
   //Debug
-//  Alarm.timerOnce(10, joreggelt);
-  Alarm.timerRepeat(30, debugLog);
-  Alarm.timerOnce(20, sensorReadDS);
+  Alarm.timerRepeat(2317, debugLog);  //kikuld egy logMsg-t
+  Alarm.timerOnce(20, sensorReadDS);  //leolvassa a homeroket indulas utan
 
   //LIGHT
   //Csak a bekapcsolást időzítjük, a kikapcsolást a lightOn fügvényből hívjuk meg.
   if (starter(24*3600, sunSet, sunRise*3600)){  //starter(long period, long duration, long offset){ if ( (now()-offset) % period < duration){
-    lightStart(86400, 43200, 54000);
+    lightStart(86400, 43200, 54000);  /*Csak a time_t tipusu ertekek lennenek eleg nagyok,
+    hogy ne keletkezzen tulcsordulas, ezert vannak a szamok kozvetlenul beirva a forrasba.*/
   }
-  Alarm.alarmRepeat(sunRise,0,0,lightOn);
-  Serial.print("sunSet: ");
-  Serial.println(sunSet, DEC); 
+  Alarm.alarmRepeat(sunRise,0,0,lightOn);  //Altalanos idozites beallitas
 
   
   //WATER PUMP
@@ -47,24 +46,26 @@ void setup(){
 }
 
 void loop(){
-  if(Serial.available() ) 
+  /*Felugyeli, hogy ne masszon el az ido*/
+  if(Serial.available() ) //Resen kell lenni, kulonben az ember konnyen 2042-ben talalhatja magat
   {
-    processSyncMessage();
+    processSyncMessage();  //lsd Timesync tabon.
   }
   
-  if(timeStatus()!= timeSet){
+  if(timeStatus()!= timeSet){  //Ha az ido nincs kalibralva, kuncsorog a rootertol egy kis pontossagot.
     Serial.print("Waiting for sync message");
     Serial.print("\n");
   }
-  Alarm.delay(1000);
+  Alarm.delay(1000);  //Ebben a formaban kell a delay-t hasznalni a TimeAlarm miatt
 }
 //--------------------
 //------STARTER-------
 //--------------------
 /*
 Eldonti be kell-e legyen eppen kapcsolva valami.
+Minden ertek sec-ben ertendo.
 period= a periodus hossza, mennyi 
-    idonkent kapcsol be ujra
+    idonkent kapcsol be ujra. Lampanal 24 óra, pumpanal 60s.
 duration= mennyi ideig van bekapcsolt allapotban
 offset= mennyi az eltolodas 0 ora 0 perchez kepest
 

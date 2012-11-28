@@ -21,3 +21,7 @@ void ido(){
 void debugLog(){
   logMessageSender();
 }
+
+//-----------------
+//------KONYEC-----
+//-----------------

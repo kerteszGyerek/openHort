@@ -22,6 +22,7 @@ void processSyncMessage() {
 }
 
 //time_t requestSync()
+  //Ettol teljesen megkergul, jobb nem kiengedni a pecset alol
 //{
 //  Serial.println("Waiting for sync message");
 //  Alarm.delay(1000);

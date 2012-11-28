@@ -1,3 +1,8 @@
+Ha ssh-val beleptel a rooterre:
+screen -x
+mielott tavozol:
+ctrl-a d
+
 Az arduino kapcsolodasahoz az alabbiak szuksegesek 
 (BlackFire 10.03)
 

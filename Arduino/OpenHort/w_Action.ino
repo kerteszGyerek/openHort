@@ -8,8 +8,6 @@ void lightOn(){
   //világitást kapcsolja be, elküldi az időpontot és a státuszt
   digitalWrite(sunPin, HIGH);
   lightOn_Log();
-//  Serial.print("Naplemente ennyi sec múlva: ");
-//  Serial.println(sunSet, DEC);
   Alarm.timerOnce(43200, lightOff);  //kikapcsolás hívása
 }
 void lightOff(){
