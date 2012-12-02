@@ -1,9 +1,6 @@
 void setup(){
   Serial.begin(9600);
-//  setSyncProvider( requestSync);  //set function to call when sync required
-  Serial.println("Waiting for sync message");
-  
-  //PIN SETUP
+
   pinMode(sunPin, OUTPUT);
   pinMode(pumpPin, OUTPUT);
   
@@ -14,7 +11,8 @@ void setup(){
 
   while(timeStatus()!= timeSet){
     //Az alarmok nem fognak rendesn mukodni, ha nincs szinkronizalva az ido, ezzel kell kezdeni.
-    Serial.println("Waiting for sync message");
+    Serial.print("Waiting for sync message");
+    Serial.print("\n");		//A println kuld egy "\r"-t is amit az openWrt nem kezel le, es ezert kell kulon lezarni a sorokat
     if(Serial.available() ){
       processSyncMessage();
     }
@@ -51,7 +49,8 @@ void loop(){
   }
   
   if(timeStatus()!= timeSet){  //Ha az ido nincs kalibralva, kuncsorog a rootertol egy kis pontossagot.
-    Serial.println("Waiting for sync message");
+    Serial.print("Waiting for sync message");
+    Serial.print("\n");
   }
   Alarm.delay(1000);  //Ebben a formaban kell a delay-t hasznalni a TimeAlarm miatt
 }

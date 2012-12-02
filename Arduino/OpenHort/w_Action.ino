@@ -68,7 +68,8 @@ void sensorReadDS(){
 //    }
 //  
 //    if (OneWire::crc8(addr, 7) != addr[7]) {
-//        Serial.println("CRC is not valid!");
+//        Serial.print("CRC is not valid!");
+//        Serial.print("\n");
 //        return;
 //    }
    
@@ -93,7 +94,8 @@ void sensorReadDS(){
     }
 //    Serial.print(" CRC=");
 //    Serial.print(OneWire::crc8(data, 8), HEX);
-//    Serial.println();
+//    Serial.print();
+//    Serial.print("\n");
   
     // convert the data to actual temperature
   
@@ -109,12 +111,13 @@ void sensorReadDS(){
 //    Serial.print("]  = ");
 //    Serial.print(T[s0]);
 //    Serial.print(" Celsius, ");
-//    Serial.println();
+//    Serial.print("\n");
     s0=s0+1;
   }
   
-//  Serial.println("No more addresses.");
-//  Serial.println();
+//  Serial.print("No more addresses.");
+//  Serial.print("\n");
+//  Serial.print("\n");
   ds.reset_search();
   
   Alarm.delay(250);
