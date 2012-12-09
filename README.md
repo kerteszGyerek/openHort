@@ -26,5 +26,6 @@ Web
 ---
 
 Az openhort.ártó.hu (igen, ékezetes) fut az uploadData.php
-Most még nagyon ne nézd meg:) nem látsz semmit.
+Az adatbázis megtekinthető itt:
+http://openhort.ártó.hu/arduino_data/displayData.php
 
