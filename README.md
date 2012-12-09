@@ -1,6 +1,8 @@
 OpenHort kertészeti vezérlő rendszer
 ====================================
 
+Az openHort projekt nyíltforrású informatikai eszközöket kíván nyújtani a mezőgazdasággal, azon belül is a kertészettel foglalkozóknak.
+
 Alapvető célok:
  - Környezeti paraméterek, növény paraméterek, mérése, tárolása egy központi adatbázisban. (hőmérséklet, páratartalom, levélhőmérséklet, levélszín, stb.)
  - Növény paraméterek manuális méréseit be lehessen illeszteni az adatbázisba. (méret, terméstömeg, szín, stb.)
