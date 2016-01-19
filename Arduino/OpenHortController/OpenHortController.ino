@@ -76,14 +76,10 @@ Helyette Serial.print("\n")
 //LIGHT
 const int dayLenght=12;  //[h]
 
-const int sunRise=15;  //[h]
+// const int sunRise=15;  //[h]
+const int sunRise=15;  //[h] # kx + nona
 unsigned long sunSet=12*3600;  //[s] Az a Alarm.timerRepeat() sec.-ben kéri az idot, nem oraban 
 #define sunPin 4
-
-//WATER
-#define pumpTime 60  //Ennyi idonkent kapcsol be a pumpa [s]
-#define pumpLenght 20  //Ennyi ideig megy a pumpa [s]
-#define pumpPin 3
 
 //TEMPERATURE
 #define sensorReadTime 1800    //szenzor beolvasas [s]
@@ -99,6 +95,10 @@ byte s0;    //Szenzorlánc aktuális tagja
 float T[2];  //Szenzorértékek tárolása
 const byte TLen = sizeof(T);
 
+//CHORES
+#define choresPin 6 
+#define choresTime 3600 //chores kapcsolgatas [s] FIXME
+#define choresLength 300 //chores ennyi ideig megy [s] FIXME 
 
 //------------------------------
 //----------LOGMESSAGE----------
@@ -112,7 +112,7 @@ A webes adatbazisba wtf:value alakban kerülnek kuldesre az adatok.
 A csv nagyon kenyelmes ssh-n terminalban, az egyszerusitett uzenetek kezelese kenyelmes bash-ban es php-ban.
 Ezert egyenlore mind a ketto mukodik.*/
 
-char* logMsg[]={"SensorNum1","Temperature1","SensorNum2","Temperature2","SensorNum3","Temperature3","pin1","WTF1","Status1","pin2","WTF2","Status2"};
+char* logMsg[]={"SensorNum1","Temperature1","SensorNum2","Temperature2","SensorNum3","Temperature3","pin1","WTF1","Status1","pin2","WTF2","Status2","pin3", "WTF3", "Status3"};
 const byte logMsgLen = sizeof(logMsg)/sizeof(char*);  //Ez igy mukodik. Nem tudom miért. Ha nincs ott a /sizeof(char*) ketszeres ertekekkel ter vissza.
 
 
@@ -160,20 +160,6 @@ void lightStart_Log(){
   Serial.print("\n");
 }
 
-void pumpOn_Log(){
-  itoa(pumpPin,logMsg[9],10);
-  logMsg[10]="Pump";
-  logMsg[11]="1";
-  dBaseActor(10,11);  
-  logMessageSender();
-}
-
-void pumpOff_Log(){
-  logMsg[10]="Pump";
-  logMsg[11]="0";
-  dBaseActor(10,11);
-  logMessageSender();
-}
 void sensorReadDS_Log(){
   
   //1.szenzor
@@ -190,6 +176,24 @@ void sensorReadDS_Log(){
 //  dtostrf(0,5, 2, logMsg[5]);
 
   
+  logMessageSender();
+}
+
+void choresStart_Log(){
+  Serial.print("Chores fel!"); //FIXME
+  Serial.print("\n");
+}
+void choresOn_Log(){
+  itoa(choresPin,logMsg[13],14); // FIXME logMsg, 10, 9 ?
+  logMsg[13]="Chores";
+  logMsg[14]="1"; // FIXME: 10, 11, ???
+  dBaseActor(13,14);
+  logMessageSender();
+}
+void choresOff_Log(){
+  logMsg[13]="Chores";
+  logMsg[14]="0"; // FIXME: 10, 11, ??
+  dBaseActor(13,14);
   logMessageSender();
 }
 
@@ -210,7 +214,7 @@ void setup(){
   Serial.begin(9600);
 
   pinMode(sunPin, OUTPUT);
-  pinMode(pumpPin, OUTPUT);
+  pinMode(choresPin, OUTPUT);
   
   
 //----------------------------   
@@ -228,6 +232,7 @@ void setup(){
   }
   //Debug
   Alarm.timerRepeat(2317, debugLog);  //kikuld egy logMsg-t
+  Alarm.timerOnce(1, choresOn);
   Alarm.timerOnce(20, sensorReadDS);  //leolvassa a homeroket indulas utan
 
   //LIGHT
@@ -238,14 +243,11 @@ void setup(){
   }
   Alarm.alarmRepeat(sunRise,0,0,lightOn);  //Altalanos idozites beallitas
 
-  
-  //WATER PUMP
-  //Csak a bekapcsolást időzítjük, a kikapcsolást a pumpOn fügvényből hívjuk meg.
-  Alarm.timerRepeat(pumpTime, pumpOn);
+  //CHORES
+  Alarm.timerRepeat(choresTime, choresOn); 
   
   //TEMPERATURE
   Alarm.timerRepeat(sensorReadTime, sensorReadDS);
-  
   
 }
 
@@ -327,20 +329,6 @@ void lightStart(long period, long duration, long offset){
   Alarm.timerOnce(t, lightOff);  //kikapcsolás hívása
 }
 
-//WATER
-void pumpOn(){
-  //pumpat kapcsolja be, elküldi az időpontot és a státuszt
-  digitalWrite(pumpPin, HIGH);
-//  pumpOn_Log();    //Nem szemeteljuk tele percenkent 2 bejegyzessel a logot
-  Alarm.timerOnce(pumpLenght, pumpOff);  //kikapcsolás hívása
-}
-
-void pumpOff(){
-  //pumpat kapcsolja ki, elküldi az időpontot és a státuszt
-  digitalWrite(pumpPin, LOW);
-//  pumpOff_Log();
-}
-
 //TEMPERATURE
 void sensorReadDS(){
   s0=0;
@@ -410,6 +398,45 @@ void sensorReadDS(){
   sensorReadDS_Log();
   return;  
 }
+
+//TAKARITAS
+void choresOn(){
+  //FIXME kapcsolja be, elküldi az időpontot és a státuszt
+  digitalWrite(choresPin, HIGH);
+  choresOn_Log();
+  Alarm.timerOnce(choresLength, choresOff);  //kikapcsolás hívása
+}
+void choresOff(){
+  //FIXME kapcsolja ki, elküldi az időpontot és a státuszt
+  digitalWrite(choresPin, LOW);
+  choresOff_Log();
+}
+
+
+
+void choresStart(long period, long duration, long offset){
+  //FIXME kapcsolja be, elküldi az időpontot és a státuszt
+//  Serial.print(period, DEC);
+//  Serial.print("\n");
+//  Serial.print(duration, DEC);
+//  Serial.print("\n");
+//  Serial.print(offset, DEC);
+//  Serial.print("\n");
+  digitalWrite(choresPin, HIGH);
+  choresStart_Log();
+  choresOn_Log();
+//  Serial.print(now(), DEC);
+//  Serial.print("( now() - timeRef - offset )= ");
+//  Serial.print(( now() - timeRef - offset ), DEC);
+//  Serial.print("\n");
+//  Serial.print("   %period= ");
+//  Serial.print(( now() - timeRef - offset ) % period, DEC);
+  long t = duration-(( now() - timeRef - offset ) % period);    //Ennyi id mulva kell kikapcsolni a FIXME
+//  Serial.print("NO: ");
+//  Serial.print(t, DEC);
+  Alarm.timerOnce(t, choresOff);  //kikapcsolás hívása
+}
+
 
 //---------------------------------------
 //----------TIME SYNCRONISATION----------
